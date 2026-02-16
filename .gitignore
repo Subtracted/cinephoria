@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage
+coverage/
+
+# Temporary
+tmp/
+temp/
+
+# Flutter
+mobile/.dart_tool/
+mobile/.packages
+mobile/build/
+mobile/android/.gradle/
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+*.iml
+
+# Electron
+desktop/dist/
+
+# Ne pas ignorer les fichiers importants
+!backend/sql/*.sql
+!.env.example
+
+# Fichiers perso / énoncé
+Memoire.md
+ECF_ENONCE.md
+
+# Flutter generated
+mobile/.idea/
+mobile/.metadata
+mobile/*.iml
+mobile/test/widget_test.dart

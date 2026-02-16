@@ -1,0 +1,50 @@
+{
+  "name": "cinephoria-backend",
+  "version": "1.0.0",
+  "description": "API REST Cinéphoria - Plateforme de gestion de cinémas",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "db:init": "node src/scripts/initDb.js",
+    "db:seed": "node src/scripts/seedDb.js"
+  },
+  "keywords": [
+    "cinema",
+    "api",
+    "rest",
+    "cinephoria"
+  ],
+  "author": "Arthur",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.1.0",
+    "morgan": "^1.10.1",
+    "nodemailer": "^8.0.1",
+    "pg": "^8.18.0"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/tests/**/*.test.js"],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/app.js",
+      "!src/scripts/**"
+    ],
+    "coverageDirectory": "coverage",
+    "verbose": true
+  }
+}
