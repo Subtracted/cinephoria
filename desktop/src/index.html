@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinéphoria - Gestion des incidents</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #1a1a2e;
+      border-bottom: 1px solid #334155;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 { color: #4ade80; font-size: 20px; }
+    .header .user-info { color: #94a3b8; font-size: 14px; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+
+    .login-box, .card {
+      background: #1a1a2e;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .login-box { width: 400px; }
+
+    h2 { color: #fff; margin-bottom: 16px; font-size: 18px; }
+    h3 { color: #4ade80; margin-bottom: 12px; font-size: 16px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; color: #94a3b8; font-size: 14px; margin-bottom: 4px; }
+
+    input, select, textarea {
+      width: 100%;
+      background: #0f0f1a;
+      border: 1px solid #334155;
+      color: #e0e0e0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: #4ade80; }
+    textarea { min-height: 80px; resize: vertical; }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: #22c55e; color: #fff; }
+    .btn-primary:hover { background: #16a34a; }
+    .btn-secondary { background: #334155; color: #e0e0e0; }
+    .btn-secondary:hover { background: #475569; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-full { width: 100%; }
+
+    .incident-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+
+    .incident-item {
+      background: #16213e;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .incident-info p { margin: 4px 0; }
+    .incident-info .label { color: #94a3b8; font-size: 12px; }
+    .incident-info .value { color: #e0e0e0; font-size: 14px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-open { background: #dc2626aa; color: #fca5a5; }
+    .badge-in_progress { background: #f59e0baa; color: #fde68a; }
+    .badge-resolved { background: #22c55eaa; color: #bbf7d0; }
+
+    .error { color: #f87171; font-size: 14px; margin: 8px 0; }
+    .success { color: #4ade80; font-size: 14px; margin: 8px 0; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab {
+      padding: 8px 16px;
+      border-radius: 8px 8px 0 0;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      background: transparent;
+      color: #94a3b8;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active { color: #4ade80; border-bottom-color: #4ade80; background: #4ade8020; }
+
+    .room-select { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+
+    .hidden { display: none; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid #475569;
+      color: #94a3b8;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .logout-btn:hover { border-color: #dc2626; color: #f87171; }
+  </style>
+</head>
+<body>
+  <!-- Page de connexion -->
+  <div id="login-page">
+    <div class="login-container">
+      <div class="login-box">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span style="font-size: 40px;">🎬</span>
+          <h2 style="color: #4ade80; margin-top: 8px;">Cinéphoria</h2>
+          <p style="color: #94a3b8; font-size: 14px;">Application bureautique - Gestion des incidents</p>
+        </div>
+        <div id="login-error" class="error hidden"></div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="votre@email.fr">
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input type="password" id="login-password" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="handleLogin()">Se connecter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page principale -->
+  <div id="main-page" class="hidden">
+    <div class="header">
+      <h1>🎬 Cinéphoria - Incidents</h1>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="user-info" id="user-name"></span>
+        <button class="logout-btn" onclick="handleLogout()">Déconnexion</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('incidents', this)">Incidents</button>
+        <button class="tab" onclick="switchTab('new-incident', this)">Signaler un incident</button>
+      </div>
+
+      <!-- Liste des incidents -->
+      <div id="tab-incidents">
+        <div class="card">
+          <h2>Incidents signalés</h2>
+          <div class="room-select">
+            <select id="filter-room" onchange="loadIncidents()" style="width: 250px;">
+              <option value="">Toutes les salles</option>
+            </select>
+            <select id="filter-status" onchange="loadIncidents()" style="width: 200px;">
+              <option value="">Tous les statuts</option>
+              <option value="open">Ouvert</option>
+              <option value="in_progress">En cours</option>
+              <option value="resolved">Résolu</option>
+            </select>
+          </div>
+          <div id="incidents-list" class="incident-list">
+            <p style="color: #94a3b8;">Chargement...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nouveau incident -->
+      <div id="tab-new-incident" class="hidden">
+        <div class="card">
+          <h2>Signaler un incident</h2>
+          <div id="incident-message"></div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Salle *</label>
+              <select id="incident-room">
+                <option value="">Sélectionner une salle</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Numéro de siège (optionnel)</label>
+              <input type="text" id="incident-seat" placeholder="Ex: A5">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description de l'incident *</label>
+            <textarea id="incident-description" placeholder="Décrivez le problème rencontré..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="submitIncident()">Signaler l'incident</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    let token = null;
+    let currentUser = null;
+
+    // =====================
+    // Authentification
+    // =====================
+    async function handleLogin() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errorEl = document.getElementById('login-error');
+      errorEl.classList.add('hidden');
+
+      try {
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          errorEl.textContent = data.error || 'Erreur de connexion';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+
+        if (!['employee', 'admin'].includes(data.user.role)) {
+          errorEl.textContent = 'Accès réservé aux employés';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+
+        token = data.token;
+        currentUser = data.user;
+        document.getElementById('user-name').textContent =
+          `${currentUser.firstName} ${currentUser.lastName}`;
+
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('main-page').classList.remove('hidden');
+
+        loadRooms();
+        loadIncidents();
+      } catch (error) {
+        errorEl.textContent = 'Impossible de se connecter au serveur';
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    function handleLogout() {
+      token = null;
+      currentUser = null;
+      document.getElementById('main-page').classList.add('hidden');
+      document.getElementById('login-page').classList.remove('hidden');
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+    }
+
+    // Enter key support
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !document.getElementById('login-page').classList.contains('hidden')) {
+        handleLogin();
+      }
+    });
+
+    // =====================
+    // Onglets
+    // =====================
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-incidents').classList.add('hidden');
+      document.getElementById('tab-new-incident').classList.add('hidden');
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+    }
+
+    // =====================
+    // Salles
+    // =====================
+    async function loadRooms() {
+      try {
+        const response = await fetch(`${API_URL}/rooms`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const rooms = await response.json();
+
+        const options = rooms.map(
+          (r) => `<option value="${r.id}">Salle ${r.room_number} - ${r.cinema_name} (${r.quality})</option>`
+        );
+
+        document.getElementById('filter-room').innerHTML =
+          '<option value="">Toutes les salles</option>' + options.join('');
+        document.getElementById('incident-room').innerHTML =
+          '<option value="">Sélectionner une salle</option>' + options.join('');
+      } catch (error) {
+        console.error('Erreur chargement salles:', error);
+      }
+    }
+
+    // =====================
+    // Incidents
+    // =====================
+    async function loadIncidents() {
+      const room = document.getElementById('filter-room').value;
+      const status = document.getElementById('filter-status').value;
+
+      let url = `${API_URL}/incidents?`;
+      if (room) url += `room=${room}&`;
+      if (status) url += `status=${status}&`;
+
+      try {
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const incidents = await response.json();
+
+        const listEl = document.getElementById('incidents-list');
+
+        if (incidents.length === 0) {
+          listEl.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aucun incident trouvé.</p>';
+          return;
+        }
+
+        listEl.innerHTML = incidents
+          .map(
+            (inc) => `
+          <div class="incident-item">
+            <div class="incident-info">
+              <p><span class="label">Salle</span> <span class="value">${inc.room_number} - ${inc.cinema_name} (${inc.city})</span></p>
+              ${inc.seat_number ? `<p><span class="label">Siège</span> <span class="value">${inc.seat_number}</span></p>` : ''}
+              <p><span class="label">Description</span> <span class="value">${inc.description}</span></p>
+              <p><span class="label">Signalé par</span> <span class="value">${inc.reported_by}</span></p>
+              <p><span class="label">Date</span> <span class="value">${new Date(inc.created_at).toLocaleDateString('fr-FR')}</span></p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+              <span class="badge badge-${inc.status}">
+                ${inc.status === 'open' ? 'Ouvert' : inc.status === 'in_progress' ? 'En cours' : 'Résolu'}
+              </span>
+              ${
+                inc.status !== 'resolved'
+                  ? `<select onchange="updateIncidentStatus(${inc.id}, this.value)" style="width: 140px; padding: 4px 8px; font-size: 12px;">
+                    <option value="">Changer...</option>
+                    <option value="open">Ouvert</option>
+                    <option value="in_progress">En cours</option>
+                    <option value="resolved">Résolu</option>
+                  </select>`
+                  : ''
+              }
+            </div>
+          </div>
+        `
+          )
+          .join('');
+      } catch (error) {
+        console.error('Erreur chargement incidents:', error);
+      }
+    }
+
+    async function submitIncident() {
+      const roomId = document.getElementById('incident-room').value;
+      const description = document.getElementById('incident-description').value;
+      const seatNumber = document.getElementById('incident-seat').value;
+      const messageEl = document.getElementById('incident-message');
+
+      if (!roomId || !description) {
+        messageEl.innerHTML = '<p class="error">Veuillez remplir tous les champs obligatoires.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/incidents`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ roomId: parseInt(roomId), description, seatNumber: seatNumber || null }),
+        });
+
+        if (response.ok) {
+          messageEl.innerHTML = '<p class="success">Incident signalé avec succès !</p>';
+          document.getElementById('incident-description').value = '';
+          document.getElementById('incident-seat').value = '';
+          loadIncidents();
+        } else {
+          const data = await response.json();
+          messageEl.innerHTML = `<p class="error">${data.error || 'Erreur'}</p>`;
+        }
+      } catch (error) {
+        messageEl.innerHTML = '<p class="error">Erreur de connexion au serveur</p>';
+      }
+    }
+
+    async function updateIncidentStatus(id, status) {
+      if (!status) return;
+
+      try {
+        await fetch(`${API_URL}/incidents/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        });
+        loadIncidents();
+      } catch (error) {
+        console.error('Erreur mise à jour:', error);
+      }
+    }
+  </script>
+</body>
+</html>
