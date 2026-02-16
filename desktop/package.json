@@ -1,0 +1,20 @@
+{
+  "name": "cinephoria-desktop",
+  "version": "1.0.0",
+  "description": "Application bureautique Cinéphoria - Gestion des incidents",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron ."
+  },
+  "keywords": [
+    "cinema",
+    "electron",
+    "incidents"
+  ],
+  "author": "Arthur",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^40.4.1"
+  }
+}
